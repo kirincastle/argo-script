@@ -114,6 +114,8 @@ makeTunnel() {
     tunnelUUID=$( $(cloudflared tunnel list | grep $tunnelName) = /[0-9a-f\-]+/)
     read -p "请输入隧道UUID（复制ID里面的内容）：" tunnelUUID
     read -p "输入传输协议（默认http）：" tunnelProtocol
+    read -p "输入target host ip（默认localhost）：" targetip
+    [[ -z $targetip ]] && targetip=localhost
     [[ -z $tunnelProtocol ]] && tunnelProtocol="http"
     read -p "输入反代端口（默认80）：" tunnelPort
     [[ -z $tunnelPort ]] && tunnelPort=80
@@ -127,7 +129,7 @@ originRequest:
   noTLSVerify: true
 ingress:
   - hostname: $tunnelDomain
-    service: $tunnelProtocol://localhost:$tunnelPort
+    service: $tunnelProtocol://$targetip:$tunnelPort
   - service: http_status:404
 EOF
     green "配置文件已保存至 /root/$tunnelFileName.yml"
